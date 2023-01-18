@@ -367,6 +367,15 @@ func (m *MachineScope) InstanceSpec() *compute.Instance {
 			instance.ShieldedInstanceConfig.EnableIntegrityMonitoring = false
 		}
 	}
+	if m.GCPMachine.Spec.OnHostMaintenance != nil {
+		instance.Scheduling.OnHostMaintenance = string(*m.GCPMachine.Spec.OnHostMaintenance)
+	}
+	if m.GCPMachine.Spec.ConfidentialCompute != nil {
+		enabled := *m.GCPMachine.Spec.ConfidentialCompute == infrav1.ConfidentialComputePolicyEnabled
+		instance.ConfidentialInstanceConfig = &compute.ConfidentialInstanceConfig{
+			EnableConfidentialCompute: enabled,
+		}
+	}
 
 	instance.Disks = append(instance.Disks, m.InstanceImageSpec())
 	instance.Disks = append(instance.Disks, m.InstanceAdditionalDiskSpec()...)

@@ -17,6 +17,7 @@ limitations under the License.
 package v1beta1
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/pkg/errors"
@@ -46,7 +47,7 @@ var _ webhook.Validator = &GCPMachineTemplate{}
 func (r *GCPMachineTemplate) ValidateCreate() error {
 	clusterlog.Info("validate create", "name", r.Name)
 
-	return nil
+	return r.validateConfidentialCompute()
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type.
@@ -98,4 +99,13 @@ func (r *GCPMachineTemplate) ValidateDelete() error {
 // Default implements webhookutil.defaulter so a webhook will be registered for the type.
 func (r *GCPMachineTemplate) Default() {
 	clusterlog.Info("default", "name", r.Name)
+}
+
+func (r *GCPMachineTemplate) validateConfidentialCompute() error {
+	if r.Spec.Template.Spec.ConfidentialCompute != nil && *r.Spec.Template.Spec.ConfidentialCompute == ConfidentialComputePolicyEnabled {
+		if r.Spec.Template.Spec.OnHostMaintenance == nil || *r.Spec.Template.Spec.OnHostMaintenance == HostMaintenancePolicyMigrate {
+			return fmt.Errorf("ConfidentialCompute require OnHostMaintenance to be set to %s, the current value is: %s", HostMaintenancePolicyTerminate, HostMaintenancePolicyMigrate)
+		}
+	}
+	return nil
 }
