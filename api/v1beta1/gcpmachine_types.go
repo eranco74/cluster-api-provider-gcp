@@ -130,6 +130,8 @@ const (
 	ConfidentialComputePolicyEnabled ConfidentialComputePolicy = "Enabled"
 	// ConfidentialComputePolicyDisabled disables confidential compute for the GCP machine.
 	ConfidentialComputePolicyDisabled ConfidentialComputePolicy = "Disabled"
+
+	confidentialComputeSupportedMachineSeries = "n2d,c2d"
 )
 
 // HostMaintenancePolicy represents the desired behavior ase of a host maintenance event.

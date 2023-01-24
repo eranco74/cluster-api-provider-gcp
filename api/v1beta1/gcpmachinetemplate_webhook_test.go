@@ -33,11 +33,12 @@ func TestGCPMachineTemplate_ValidateCreate(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name: "GCPMachineTemplated with OnHostMaintenance set to TERMINATE - valid",
+			name: "GCPMachineTemplate with OnHostMaintenance set to TERMINATE - valid",
 			template: &GCPMachineTemplate{
 				Spec: GCPMachineTemplateSpec{
 					Template: GCPMachineTemplateResource{
 						Spec: GCPMachineSpec{
+							InstanceType:      "n2d-standard-4",
 							OnHostMaintenance: &onHostMaintenanceTerminate,
 						}},
 				},
@@ -45,11 +46,12 @@ func TestGCPMachineTemplate_ValidateCreate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "GCPMachineTemplated with ConfidentialCompute enabled and OnHostMaintenance set to TERMINATE - valid",
+			name: "GCPMachineTemplate with ConfidentialCompute enabled and OnHostMaintenance set to TERMINATE - valid",
 			template: &GCPMachineTemplate{
 				Spec: GCPMachineTemplateSpec{
 					Template: GCPMachineTemplateResource{
 						Spec: GCPMachineSpec{
+							InstanceType:        "n2d-standard-4",
 							ConfidentialCompute: &confidentialComputeEnabled,
 							OnHostMaintenance:   &onHostMaintenanceTerminate,
 						}},
@@ -58,11 +60,12 @@ func TestGCPMachineTemplate_ValidateCreate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "GCPMachineTemplated with ConfidentialCompute enabled and OnHostMaintenance set to MIGRATE - invalid",
+			name: "GCPMachineTemplate with ConfidentialCompute enabled and OnHostMaintenance set to MIGRATE - invalid",
 			template: &GCPMachineTemplate{
 				Spec: GCPMachineTemplateSpec{
 					Template: GCPMachineTemplateResource{
 						Spec: GCPMachineSpec{
+							InstanceType:        "n2d-standard-4",
 							ConfidentialCompute: &confidentialComputeEnabled,
 							OnHostMaintenance:   &onHostMaintenanceMigrate,
 						}},
@@ -71,16 +74,30 @@ func TestGCPMachineTemplate_ValidateCreate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "GCPMachineTemplated with ConfidentialCompute enabled and default OnHostMaintenance (MIGARTE) - invalid",
+			name: "GCPMachineTemplate with ConfidentialCompute enabled and default OnHostMaintenance (MIGARTE) - invalid",
 			template: &GCPMachineTemplate{
 				Spec: GCPMachineTemplateSpec{
 					Template: GCPMachineTemplateResource{
 						Spec: GCPMachineSpec{
+							InstanceType:        "n2d-standard-4",
 							ConfidentialCompute: &confidentialComputeEnabled,
 						}},
 				},
 			},
-
+			wantErr: true,
+		},
+		{
+			name: "GCPMachineTemplate with ConfidentialCompute enabled and unsupported instance type - invalid",
+			template: &GCPMachineTemplate{
+				Spec: GCPMachineTemplateSpec{
+					Template: GCPMachineTemplateResource{
+						Spec: GCPMachineSpec{
+							InstanceType:        "e2-standard-4",
+							ConfidentialCompute: &confidentialComputeEnabled,
+							OnHostMaintenance:   &onHostMaintenanceTerminate,
+						}},
+				},
+			},
 			wantErr: true,
 		},
 	}

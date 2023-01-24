@@ -19,6 +19,7 @@ package v1beta1
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/pkg/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -104,6 +105,11 @@ func (m *GCPMachine) validateConfidentialCompute() error {
 	if m.Spec.ConfidentialCompute != nil && *m.Spec.ConfidentialCompute == ConfidentialComputePolicyEnabled {
 		if m.Spec.OnHostMaintenance == nil || *m.Spec.OnHostMaintenance == HostMaintenancePolicyMigrate {
 			return fmt.Errorf("ConfidentialCompute require OnHostMaintenance to be set to %s, the current value is: %s", HostMaintenancePolicyTerminate, HostMaintenancePolicyMigrate)
+		}
+
+		machineSeries := strings.Split(m.Spec.InstanceType, "-")[0]
+		if machineSeries == "" || !strings.Contains(confidentialComputeSupportedMachineSeries, machineSeries) {
+			return fmt.Errorf("ConfidentialCompute require instance type in the following series: %s", confidentialComputeSupportedMachineSeries)
 		}
 	}
 	return nil

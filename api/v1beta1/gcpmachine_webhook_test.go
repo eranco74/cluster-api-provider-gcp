@@ -36,6 +36,7 @@ func TestGCPMachine_ValidateCreate(t *testing.T) {
 			name: "GCPMachined with OnHostMaintenance set to TERMINATE - valid",
 			GCPMachine: &GCPMachine{
 				Spec: GCPMachineSpec{
+					InstanceType:      "n2d-standard-4",
 					OnHostMaintenance: &onHostMaintenanceTerminate,
 				},
 			},
@@ -45,6 +46,7 @@ func TestGCPMachine_ValidateCreate(t *testing.T) {
 			name: "GCPMachined with ConfidentialCompute enabled and OnHostMaintenance set to TERMINATE - valid",
 			GCPMachine: &GCPMachine{
 				Spec: GCPMachineSpec{
+					InstanceType:        "n2d-standard-4",
 					OnHostMaintenance:   &onHostMaintenanceTerminate,
 					ConfidentialCompute: &confidentialComputeEnabled,
 				},
@@ -55,6 +57,7 @@ func TestGCPMachine_ValidateCreate(t *testing.T) {
 			name: "GCPMachined with ConfidentialCompute enabled and OnHostMaintenance set to MIGRATE - invalid",
 			GCPMachine: &GCPMachine{
 				Spec: GCPMachineSpec{
+					InstanceType:        "n2d-standard-4",
 					OnHostMaintenance:   &onHostMaintenanceMigrate,
 					ConfidentialCompute: &confidentialComputeEnabled,
 				},
@@ -65,7 +68,19 @@ func TestGCPMachine_ValidateCreate(t *testing.T) {
 			name: "GCPMachined with ConfidentialCompute enabled and default OnHostMaintenance (MIGARTE) - invalid",
 			GCPMachine: &GCPMachine{
 				Spec: GCPMachineSpec{
+					InstanceType:        "n2d-standard-4",
 					ConfidentialCompute: &confidentialComputeEnabled,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "GCPMachined with ConfidentialCompute enabled and unsupported instance type - invalid",
+			GCPMachine: &GCPMachine{
+				Spec: GCPMachineSpec{
+					InstanceType:        "e2-standard-4",
+					ConfidentialCompute: &confidentialComputeEnabled,
+					OnHostMaintenance:   &onHostMaintenanceTerminate,
 				},
 			},
 			wantErr: true,
